@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +21,21 @@ public class Layout2Adapter extends RecyclerView.Adapter<Layout2Adapter.ViewHold
         this.context=context;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+     class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView addrText;
 
         private ViewHolder(View view){
             super(view);
             this.addrText = view.findViewById(R.id.addr);
+            this.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Layout2Adapter.this.context,FirstPageActivity.class);
+                    intent.putExtra("addr",addrText.getText().toString().substring(3));
+                    Layout2Adapter.this.context.startActivity(intent);
+                }
+            });
         }
     }
 

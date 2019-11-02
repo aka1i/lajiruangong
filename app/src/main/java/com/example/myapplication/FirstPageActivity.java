@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -34,17 +36,40 @@ public class FirstPageActivity extends AppCompatActivity {
     }
 
     private void init(){
-        shopBeans.clear();
-        progressDialog=new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("正在重置中...");
-        progressDialog.show();
         recyclerView = findViewById(R.id.layout1_rv);
-        String url = "http://www.dianping.com/mylist/ajax/shoprank?rankId=63e27f60bce99dbebf1b5da58856513471862f838d1255ea693b953b1d49c7c0";
+        String addr = getIntent().getStringExtra("addr");
 
-        HttpUtil.getRequestWithokHttp(url,handler);
+        if (addr != null){
+            Log.d("adsadsadsad",addr);
+            shopBeans = map.get(addr);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            shopBeans.sort(new Comparator<ShopBean>() {
+                @Override
+                public int compare(ShopBean o1, ShopBean o2) {
+                    double temp = Double.parseDouble(o2.getRefinedScore1()) - Double.parseDouble(o1.getRefinedScore1());
+                    if (temp > 0)
+                        return 1;
+                    else if (temp == 0)
+                        return 0;
+                    else
+                        return -1;
+                }
+            });
+            Layout1Adapter layout1Adapter = new Layout1Adapter(shopBeans,FirstPageActivity.this);
+            recyclerView.setAdapter(layout1Adapter);
+        }
+        else {
+            shopBeans.clear();
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setCancelable(false);
+            progressDialog.setMessage("正在重置中...");
+            progressDialog.show();
+            String url = "http://www.dianping.com/mylist/ajax/shoprank?rankId=63e27f60bce99dbebf1b5da58856513471862f838d1255ea693b953b1d49c7c0";
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            HttpUtil.getRequestWithokHttp(url,handler);
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
 
 
     }
