@@ -17,11 +17,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class FirstPageActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
-    private List<ShopBean> shopBeans = new ArrayList<>();
+    private List<ShopBean> shopBeans = BeanLab.get().getShopBeans();
+    private Map<String, List<ShopBean>> map = BeanLab.get().getMap();
     private RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class FirstPageActivity extends AppCompatActivity {
     }
 
     private void init(){
+        shopBeans.clear();
         progressDialog=new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("正在重置中...");
@@ -64,12 +68,31 @@ public class FirstPageActivity extends AppCompatActivity {
                             bean.setMainRegionName(object.getString("mainRegionName"));
                             bean.setRefinedScore1(object.getString("refinedScore1"));
                             shopBeans.add(bean);
+                            List<ShopBean> beans = map.get(bean.getMainRegionName());
+                            if (beans == null){
+                                beans = new ArrayList<>();
+                                map.put(bean.getMainRegionName(),beans);
+                            }
+                            beans.add(bean);
+
 //                            Toast.makeText(getApplicationContext(),bean.getShopName(),Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 //                    Toast.makeText(getApplicationContext(),"成功",Toast.LENGTH_SHORT).show();
+                    shopBeans.sort(new Comparator<ShopBean>() {
+                        @Override
+                        public int compare(ShopBean o1, ShopBean o2) {
+                            double temp = Double.parseDouble(o2.getRefinedScore1()) - Double.parseDouble(o1.getRefinedScore1());
+                            if (temp > 0)
+                                return 1;
+                            else if (temp == 0)
+                                return 0;
+                            else
+                                return -1;
+                        }
+                    });
                     Layout1Adapter layout1Adapter = new Layout1Adapter(shopBeans,FirstPageActivity.this);
                     recyclerView.setAdapter(layout1Adapter);
                     break;
