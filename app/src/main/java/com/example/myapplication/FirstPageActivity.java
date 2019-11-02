@@ -58,6 +58,11 @@ public class FirstPageActivity extends AppCompatActivity {
             Layout1Adapter layout1Adapter = new Layout1Adapter(shopBeans,FirstPageActivity.this);
             recyclerView.setAdapter(layout1Adapter);
         }
+        else if (shopBeans.size() >0){
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            Layout1Adapter layout1Adapter = new Layout1Adapter(shopBeans,FirstPageActivity.this);
+            recyclerView.setAdapter(layout1Adapter);
+        }
         else {
             shopBeans.clear();
             progressDialog=new ProgressDialog(this);
